@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pong Game</title>
+    <style>
+        canvas {
+            background-color: black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="pong" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById("pong");
+        const ctx = canvas.getContext("2d");
+
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        let leftPaddleY = (canvas.height - paddleHeight) / 2;
+        let rightPaddleY = leftPaddleY;
+        const paddleSpeed = 5;
+
+        const ballSize = 10;
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+
+
+        function gameLoop() {
+            movePaddles();
+            moveBall();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+
+        function movePaddles() {
+
+            if (leftPaddleY > 0 && keys.w) {
+                leftPaddleY -= paddleSpeed;
+            }
+            if (leftPaddleY + paddleHeight < canvas.height && keys.s) {
+                leftPaddleY += paddleSpeed;
+            }
+
+            if (rightPaddleY + paddleHeight / 2 < ballY) {
+                rightPaddleY += paddleSpeed;
+            } else if (rightPaddleY + paddleHeight / 2 > ballY) {
+                rightPaddleY -= paddleSpeed;
+            }
+        }
+
+
+        function moveBall() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+
+            if (ballY < 0 || ballY > canvas.height) {
+                ballSpeedY *= -1;
+            }
+
+            if (
+                ballX < paddleWidth &&
+                ballY > leftPaddleY &&
+                ballY < leftPaddleY + paddleHeight
+            ) {
+                ballSpeedX *= -1;
+            }
+            if (
+                ballX > canvas.width - paddleWidth &&
+                ballY > rightPaddleY &&
+                ballY < rightPaddleY + paddleHeight
+            ) {
+                ballSpeedX *= -1;
+            }
+
+            if (ballX < 0 || ballX > canvas.width) {
+
+                ballX = canvas.width / 2;
+                ballY = canvas.height / 2;
+
+                ballSpeedX = 5;
+                ballSpeedY = 5;
+            }
+        }
+
+
+        function draw() {
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, leftPaddleY, paddleWidth, paddleHeight);
+            ctx.fillRect(
+                canvas.width - paddleWidth,
+                rightPaddleY,
+                paddleWidth,
+                paddleHeight
+            );
+
+            ctx.beginPath();
+            ctx.arc(ballX, ballY, ballSize, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        const keys = {};
+        document.addEventListener("keydown", (event) => {
+            keys[event.key.toLowerCase()] = true;
+        });
+        document.addEventListener("keyup", (event) => {
+            keys[event.key.toLowerCase()] = false;
+        });
+
+
+        gameLoop();
+    </script>
+    <h1 style="text-align: center;">Pong Game <br><h3 style="text-align: center;">Press W or S to Move Paddles</h3></h1>
+</body>
+</html>
